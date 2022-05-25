@@ -776,7 +776,16 @@ ${ui.includeFragment("kenyaui", "widget/dialogForm", [
                     type: "GET",
                     async: true, // asynchronous
                     timeout: 10000, // 10 sec timeout
-                    headers: { Authorization: 'Bearer ' + authToken},
+                    cors: true,
+                    contentType:'application/json',
+                    secure: true,
+                    headers: { 
+                        Authorization: 'Bearer ' + authToken,
+                        'Access-Control-Allow-Origin': '*',
+                    },
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader ("Authorization", "Bearer " + authToken);
+                    },
                     error: function(err) {
                         // hide spinner
                         display_loading_validate_identifier(false);

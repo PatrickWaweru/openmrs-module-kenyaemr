@@ -50,6 +50,7 @@
 			<set>
 				<ref bean="kenyaemr.common.report.artDrug" />
 				<ref bean="kenyaemr.common.report.etlMissedAppointments" />
+				<ref bean="kenyaemr.etl.common.report.threePM"/>
 				<ref bean="kenyaemr.etl.common.report.moh731"/>
 				<ref bean="kenyaemr.common.report.moh745"/>
 				<ref bean="kenyaemr.etl.common.report.Moh731KDoD"/>
@@ -463,6 +464,18 @@
 				<ref bean="kenyaemr.app.reports" />
 			</set>
 		</property>
+	</bean>
+
+	<bean id="kenyaemr.etl.common.report.threePM" class="org.openmrs.module.kenyacore.report.IndicatorReportDescriptor">
+		<property name="targetUuid" value="f8b09ca1-9bbd-44ea-ab49-c94306f53135" />
+		<property name="name" value="3PM Report" />
+		<property name="description" value="3PM Report" />
+		<property name="apps">
+			<set>
+				<ref bean="kenyaemr.app.reports" />
+			</set></property>
+		<!--<property name="template" value="kenyaemr:moh731_greencard_template.xls" />-->
+		<property name="template" value="kenyaemr:moh731.xls" />
 	</bean>
 
 	<bean id="kenyaemr.etl.common.report.moh731" class="org.openmrs.module.kenyacore.report.IndicatorReportDescriptor">

@@ -83,6 +83,7 @@ public class AdxViewFragmentController {
     DateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     public static final String KPIF_MONTHLY_REPORT = "Monthly report";
     public static final String MOH_731 = "MOH 731";
+    public static final String THREEPM_REPORT = "3PM REPORT";
 
     public void get(@RequestParam("request") ReportRequest reportRequest,
                     @RequestParam("returnUrl") String returnUrl,
@@ -113,9 +114,11 @@ public class AdxViewFragmentController {
         model.addAttribute("reportName", definition.getName());
         model.addAttribute("returnUrl", returnUrl);
         if (definition.getName() != null) {
-            if (definition.getName().equals(KPIF_MONTHLY_REPORT)) {
+            if (definition.getName().equalsIgnoreCase(KPIF_MONTHLY_REPORT)) {
                 model.addAttribute("serverAddress", KPIF_SERVER_ADDRESS);
-            } else if (definition.getName().equals(MOH_731)) {
+            } else if (definition.getName().equalsIgnoreCase(MOH_731)) {
+                model.addAttribute("serverAddress", serverAddress != null ? serverAddress : SERVER_ADDRESS);
+            } else if (definition.getName().equalsIgnoreCase(THREEPM_REPORT)) {
                 model.addAttribute("serverAddress", serverAddress != null ? serverAddress : SERVER_ADDRESS);
             }
         }
@@ -136,10 +139,12 @@ public class AdxViewFragmentController {
         Location location = locationService.getLocation(locationId);
         ObjectNode mappingDetails = null;
 
-        if (reportName.equals(MOH_731)) {
+        if (reportName.equalsIgnoreCase(MOH_731)) {
             mappingDetails = EmrUtils.getDatasetMappingForReport(reportName, administrationService.getGlobalProperty("kenyaemr.adxDatasetMapping"));
-        } else if (reportName.equals(KPIF_MONTHLY_REPORT)) {
+        } else if (reportName.equalsIgnoreCase(KPIF_MONTHLY_REPORT)) {
             mappingDetails = EmrUtils.getDatasetMappingForReport(reportName, administrationService.getGlobalProperty("kenyakeypop.adx3pmDatasetMapping"));
+        } else if (reportName.equalsIgnoreCase(THREEPM_REPORT)) {
+            mappingDetails = EmrUtils.getDatasetMappingForReport(reportName, administrationService.getGlobalProperty("kenyakeypop.3pmDatasetMapping"));
         }
 
         String mfl = "Unknown";
@@ -162,7 +167,7 @@ public class AdxViewFragmentController {
 
             // String datasetName = null;
 
-            if (mappingDetails.get("datasets").getElements() != null && reportName.equals(MOH_731)) {
+            if (mappingDetails.get("datasets").getElements() != null && reportName.equalsIgnoreCase(MOH_731)) {
 
                 for (Iterator<JsonNode> it = mappingDetails.get("datasets").iterator(); it.hasNext(); ) {
                     ObjectNode node = (ObjectNode) it.next();
@@ -171,7 +176,7 @@ public class AdxViewFragmentController {
                         break;
                     }
                 }
-            } else if (mappingDetails.get("datasets").getElements() != null && reportName.equals(KPIF_MONTHLY_REPORT)) {
+            } else if (mappingDetails.get("datasets").getElements() != null && reportName.equalsIgnoreCase(KPIF_MONTHLY_REPORT)) {
 
                 for (Iterator<JsonNode> it = mappingDetails.get("datasets").iterator(); it.hasNext(); ) {
                     ObjectNode node = (ObjectNode) it.next();
@@ -204,11 +209,13 @@ public class AdxViewFragmentController {
                         if (indicatorName.contains("PWUD"))
                             continue;
 
+                        // System.err.println("Indicator Name: " + indicatorName);
                         mappedIndicatorId = get3PIndicatorId(indicatorName);
 
-                        String[] combos = mappedIndicatorId.split("-");
-
-                        w.append("\t\t").append("<dataValue dataElement=\"" + combos[0] + "\" categoryOptionCombo=\"" + combos[1] + "\" value=\"" + value.toString() + "\"/>\n");
+                        if(mappedIndicatorId != null) {
+                            String[] combos = mappedIndicatorId.split("-");
+                            w.append("\t\t").append("<dataValue dataElement=\"" + combos[0] + "\" categoryOptionCombo=\"" + combos[1] + "\" value=\"" + value.toString() + "\"/>\n");
+                        }
                     }
                 }
             }

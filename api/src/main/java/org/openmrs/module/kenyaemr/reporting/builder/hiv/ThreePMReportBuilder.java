@@ -32,11 +32,11 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Report builder for ETL MOH 731
+ * Report builder for 3PM
  */
 @Component
-@Builds({"kenyaemr.etl.common.report.moh731"})
-public class Moh731ReportBuilder extends AbstractReportBuilder {
+@Builds({"kenyaemr.etl.common.report.threePM"})
+public class ThreePMReportBuilder extends AbstractReportBuilder {
     @Autowired
     private CommonDimensionLibrary commonDimensions;
 
@@ -124,18 +124,292 @@ public class Moh731ReportBuilder extends AbstractReportBuilder {
         );
     }
 
+    @SafeVarargs
     @Override
     protected List<Mapped<DataSetDefinition>> buildDataSets(ReportDescriptor reportDescriptor, ReportDefinition reportDefinition) {
         return Arrays.asList(
-                ReportUtils.map(hivTestingAndCouselingDatasetDefinition(), "startDate=${startDate},endDate=${endDate}"),
-                ReportUtils.map(pmtctDataSet(), "startDate=${startDate},endDate=${endDate}"),
-                ReportUtils.map(careAndTreatmentDataSet(), "startDate=${startDate},endDate=${endDate}"),
-                ReportUtils.map(voluntaryMaleCircumcisionDatasetDefinition(), "startDate=${startDate},endDate=${endDate}")
+                // ReportUtils.map(hivTestingAndCouselingDatasetDefinition(), "startDate=${startDate},endDate=${endDate}"),
+                // ReportUtils.map(pmtctDataSet(), "startDate=${startDate},endDate=${endDate}"),
+                // ReportUtils.map(careAndTreatmentDataSet(), "startDate=${startDate},endDate=${endDate}"),
+                // ReportUtils.map(voluntaryMaleCircumcisionDatasetDefinition(), "startDate=${startDate},endDate=${endDate}")
+                //HTS
+                ReportUtils.map(htsDataset(), "startDate=${startDate},endDate=${endDate}"),
+                //VMMC
+                ReportUtils.map(vmmcDataset(), "startDate=${startDate},endDate=${endDate}"),
+                //HCT
+                ReportUtils.map(hctDataset(), "startDate=${startDate},endDate=${endDate}"),
+                //PMTCT
+                ReportUtils.map(pmtctDataset(), "startDate=${startDate},endDate=${endDate}"),
+                //OTZ
+                ReportUtils.map(otzDataset(), "startDate=${startDate},endDate=${endDate}"),
+                //TB
+                ReportUtils.map(tbDataset(), "startDate=${startDate},endDate=${endDate}"),
+                //PrEP
+                ReportUtils.map(prepDataset(), "startDate=${startDate},endDate=${endDate}"),
+                //PVCT
+                ReportUtils.map(pvctDataset(), "startDate=${startDate},endDate=${endDate}"),
+                //LAB
+                ReportUtils.map(labDataset(), "startDate=${startDate},endDate=${endDate}"),
+                //ARV and TB Meds
+                ReportUtils.map(arvDataset(), "startDate=${startDate},endDate=${endDate}"),
+                //DQA
+                ReportUtils.map(dqaDataset(), "startDate=${startDate},endDate=${endDate}"),
+                //LAB Commodities
+                ReportUtils.map(labCommoditiesDataset(), "startDate=${startDate},endDate=${endDate}"),
+                //BMT
+                ReportUtils.map(bmtDataset(), "startDate=${startDate},endDate=${endDate}")
         );
     }
 
     /**
-     * Creates the dataset for section #2: Prevention of Mother-to-Child Transmission (PMTCT)
+     * Creates the dataset for HTS
+     *
+     * @return the dataset
+     */
+    protected DataSetDefinition htsDataset() {
+        CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
+
+        dsd.setName("1");
+        dsd.setDescription("HTS");
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        String indParams = "startDate=${startDate},endDate=${endDate}";
+        dsd.addColumn("HV02-01", "First ANC Visit", ReportUtils.map(moh731GreenCardIndicators.firstANCVisitMchmsAntenatal(), indParams), "");
+
+        return(dsd);
+    }
+
+    /**
+     * Creates the dataset for VMMC
+     *
+     * @return the dataset
+     */
+    protected DataSetDefinition vmmcDataset() {
+        CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
+
+        dsd.setName("2");
+        dsd.setDescription("VMMC");
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        String indParams = "startDate=${startDate},endDate=${endDate}";
+        dsd.addColumn("HV02-01", "First ANC Visit", ReportUtils.map(moh731GreenCardIndicators.firstANCVisitMchmsAntenatal(), indParams), "");
+
+        return(dsd);
+    }
+
+    /**
+     * Creates the dataset for HCT
+     *
+     * @return the dataset
+     */
+    protected DataSetDefinition hctDataset() {
+        CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
+
+        dsd.setName("3");
+        dsd.setDescription("HCT");
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        String indParams = "startDate=${startDate},endDate=${endDate}";
+        dsd.addColumn("HV02-01", "First ANC Visit", ReportUtils.map(moh731GreenCardIndicators.firstANCVisitMchmsAntenatal(), indParams), "");
+
+        return(dsd);
+    }
+
+    /**
+     * Creates the dataset for PMTCT
+     *
+     * @return the dataset
+     */
+    protected DataSetDefinition pmtctDataset() {
+        CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
+
+        dsd.setName("4");
+        dsd.setDescription("Prevention of Mother-To-Child Transmission");
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        String indParams = "startDate=${startDate},endDate=${endDate}";
+        dsd.addColumn("HV02-01", "First ANC Visit", ReportUtils.map(moh731GreenCardIndicators.firstANCVisitMchmsAntenatal(), indParams), "");
+
+        return(dsd);
+    }
+
+    /**
+     * Creates the dataset for OTZ
+     *
+     * @return the dataset
+     */
+    protected DataSetDefinition otzDataset() {
+        CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
+        
+        dsd.setName("5");
+        dsd.setDescription("OTZ");
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        String indParams = "startDate=${startDate},endDate=${endDate}";
+        dsd.addColumn("HV02-01", "First ANC Visit", ReportUtils.map(moh731GreenCardIndicators.firstANCVisitMchmsAntenatal(), indParams), "");
+
+        return(dsd);
+    }
+
+    /**
+     * Creates the dataset for TB
+     *
+     * @return the dataset
+     */
+    protected DataSetDefinition tbDataset() {
+        CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
+        
+        dsd.setName("6");
+        dsd.setDescription("TB");
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        String indParams = "startDate=${startDate},endDate=${endDate}";
+        dsd.addColumn("HV02-01", "First ANC Visit", ReportUtils.map(moh731GreenCardIndicators.firstANCVisitMchmsAntenatal(), indParams), "");
+
+        return(dsd);
+    }
+
+    /**
+     * Creates the dataset for PREP
+     *
+     * @return the dataset
+     */
+    protected DataSetDefinition prepDataset() {
+        CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
+        
+        dsd.setName("7");
+        dsd.setDescription("PREP");
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        String indParams = "startDate=${startDate},endDate=${endDate}";
+        dsd.addColumn("HV02-01", "First ANC Visit", ReportUtils.map(moh731GreenCardIndicators.firstANCVisitMchmsAntenatal(), indParams), "");
+
+        return(dsd);
+    }
+
+    /**
+     * Creates the dataset for PVCT
+     *
+     * @return the dataset
+     */
+    protected DataSetDefinition pvctDataset() {
+        CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
+        
+        dsd.setName("8");
+        dsd.setDescription("PVCT");
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        String indParams = "startDate=${startDate},endDate=${endDate}";
+        dsd.addColumn("HV02-01", "First ANC Visit", ReportUtils.map(moh731GreenCardIndicators.firstANCVisitMchmsAntenatal(), indParams), "");
+
+        return(dsd);
+    }
+
+    /**
+     * Creates the dataset for LAB
+     *
+     * @return the dataset
+     */
+    protected DataSetDefinition labDataset() {
+        CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
+        
+        dsd.setName("9");
+        dsd.setDescription("LAB");
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        String indParams = "startDate=${startDate},endDate=${endDate}";
+        dsd.addColumn("HV02-01", "First ANC Visit", ReportUtils.map(moh731GreenCardIndicators.firstANCVisitMchmsAntenatal(), indParams), "");
+
+        return(dsd);
+    }
+
+    /**
+     * Creates the dataset for ARV
+     *
+     * @return the dataset
+     */
+    protected DataSetDefinition arvDataset() {
+        CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
+        
+        dsd.setName("10");
+        dsd.setDescription("ARV");
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        String indParams = "startDate=${startDate},endDate=${endDate}";
+        dsd.addColumn("HV02-01", "First ANC Visit", ReportUtils.map(moh731GreenCardIndicators.firstANCVisitMchmsAntenatal(), indParams), "");
+
+        return(dsd);
+    }
+
+    /**
+     * Creates the dataset for DQA
+     *
+     * @return the dataset
+     */
+    protected DataSetDefinition dqaDataset() {
+        CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
+        
+        dsd.setName("11");
+        dsd.setDescription("DQA");
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        String indParams = "startDate=${startDate},endDate=${endDate}";
+        dsd.addColumn("HV02-01", "First ANC Visit", ReportUtils.map(moh731GreenCardIndicators.firstANCVisitMchmsAntenatal(), indParams), "");
+
+        return(dsd);
+    }
+
+    /**
+     * Creates the dataset for LAB COMMODITIES
+     *
+     * @return the dataset
+     */
+    protected DataSetDefinition labCommoditiesDataset() {
+        CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
+        
+        dsd.setName("12");
+        dsd.setDescription("LAB COMMODITIES");
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        String indParams = "startDate=${startDate},endDate=${endDate}";
+        dsd.addColumn("HV02-01", "First ANC Visit", ReportUtils.map(moh731GreenCardIndicators.firstANCVisitMchmsAntenatal(), indParams), "");
+
+        return(dsd);
+    }
+
+    /**
+     * Creates the dataset for BMT
+     *
+     * @return the dataset
+     */
+    protected DataSetDefinition bmtDataset() {
+        CohortIndicatorDataSetDefinition dsd = new CohortIndicatorDataSetDefinition();
+        
+        dsd.setName("13");
+        dsd.setDescription("BMT");
+        dsd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
+
+        String indParams = "startDate=${startDate},endDate=${endDate}";
+        dsd.addColumn("HV02-01", "First ANC Visit", ReportUtils.map(moh731GreenCardIndicators.firstANCVisitMchmsAntenatal(), indParams), "");
+
+        return(dsd);
+    }
+
+    /**
+     * Creates the dataset for section #2: Prevention of Mother-to-Child Transmission
      *
      * @return the dataset
      */

@@ -626,8 +626,8 @@ public class PublicHealthActionCohortLibrary {
      */
     public CohortDefinition contactsUndocumentedHIVStatus() {
         String sqlQuery = "select pc.id\n" +
-                "from openmrs.kenyaemr_hiv_testing_patient_contact pc\n" +
-                "         inner join openmrs.patient p on p.patient_id = pc.patient_related_to and p.voided = 0\n" +
+                "from kenyaemr_hiv_testing_patient_contact pc\n" +
+                "         inner join patient p on p.patient_id = pc.patient_related_to and p.voided = 0\n" +
                 "left join (select ht.patient_id, mid(max(concat(date(ht.visit_date), ht.final_test_result)), 11) as hiv_status\n" +
                 " from kenyaemr_etl.etl_hts_test ht\n" +
                 " group by ht.patient_id\n" +
@@ -658,8 +658,8 @@ public class PublicHealthActionCohortLibrary {
                 "             pc.date_created,\n" +
                 "             pc.voided,\n" +
                 "             ht.patient_id as tested_contact\n" +
-                "      from openmrs.kenyaemr_hiv_testing_patient_contact pc\n" +
-                "               inner join openmrs.patient p on p.patient_id = pc.patient_related_to and p.voided = 0\n" +
+                "      from kenyaemr_hiv_testing_patient_contact pc\n" +
+                "               inner join patient p on p.patient_id = pc.patient_related_to and p.voided = 0\n" +
                 "               left join (select ht.patient_id,\n" +
                 "                                 mid(max(concat(date(ht.visit_date), ht.final_test_result)), 11) as hiv_status\n" +
                 "                          from kenyaemr_etl.etl_hts_test ht\n" +

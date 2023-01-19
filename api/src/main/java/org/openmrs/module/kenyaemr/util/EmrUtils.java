@@ -243,15 +243,18 @@ public class EmrUtils {
 	public static ObjectNode getDatasetMappingForReport(String reportName, String mappingString) throws IOException {
 
 		ObjectMapper mapper = new ObjectMapper();
+		System.err.println("Mapping String: " + mappingString);
 		ArrayNode conf = (ArrayNode) mapper.readTree(mappingString);
 
 		for (Iterator<JsonNode> it = conf.iterator(); it.hasNext(); ) {
 			ObjectNode node = (ObjectNode) it.next();
 			if (node.get("reportName").asText().equals(reportName)) {
+				System.err.println("Data mapping found: " + node);
 				return node;
 			}
 		}
 
+		System.err.println("No data mapping found. Returning NULL");
 		return null;
 	}
 

@@ -18,6 +18,7 @@ import org.openmrs.module.kenyaemr.reporting.library.ETLReports.MOH731.ETLMoh731
 import org.openmrs.module.kenyaemr.reporting.library.ETLReports.MOH731.ETLPmtctCohortLibrary;
 import org.openmrs.module.kenyaemr.reporting.library.ETLReports.MOH731.ETLPmtctIndicatorLibrary;
 import org.openmrs.module.kenyaemr.reporting.library.ETLReports.MOH731Greencard.ETLMoh731GreenCardIndicatorLibrary;
+import org.openmrs.module.kenyaemr.reporting.library.ETLReports.ThreePMGreencard.ETLThreePMGreenCardIndicatorLibrary;
 import org.openmrs.module.kenyaemr.reporting.library.shared.common.CommonDimensionLibrary;
 import org.openmrs.module.reporting.dataset.definition.CohortIndicatorDataSetDefinition;
 import org.openmrs.module.reporting.dataset.definition.DataSetDefinition;
@@ -42,6 +43,9 @@ public class ThreePMReportBuilder extends AbstractReportBuilder {
 
     @Autowired
     private ETLMoh731GreenCardIndicatorLibrary moh731GreenCardIndicators;
+
+    @Autowired
+    private ETLThreePMGreenCardIndicatorLibrary etlThreePMGreenCardIndicators;
 
 
     public static final String DATE_FORMAT = "yyyy-MM-dd";
@@ -175,7 +179,7 @@ public class ThreePMReportBuilder extends AbstractReportBuilder {
         dsd.addParameter(new Parameter("endDate", "End Date", Date.class));
 
         String indParams = "startDate=${startDate},endDate=${endDate}";
-        dsd.addColumn("HV02-01", "First ANC Visit", ReportUtils.map(moh731GreenCardIndicators.firstANCVisitMchmsAntenatal(), indParams), "");
+        dsd.addColumn("ZhI3TLG2Iea", "Total Screened", ReportUtils.map(etlThreePMGreenCardIndicators.getTotalHTSscreened(), indParams), "");
 
         return(dsd);
     }

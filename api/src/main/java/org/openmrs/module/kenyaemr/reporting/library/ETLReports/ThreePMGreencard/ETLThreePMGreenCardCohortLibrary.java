@@ -7,7 +7,7 @@
  * Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
  * graphic logo is a trademark of OpenMRS Inc.
  */
-package org.openmrs.module.kenyaemr.reporting.library.ETLReports.MOH731Greencard;
+package org.openmrs.module.kenyaemr.reporting.library.ETLReports.ThreePMGreencard;
 
 import org.openmrs.module.kenyacore.report.ReportUtils;
 import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
@@ -34,10 +34,22 @@ import java.util.Date;
 @Component
 
 
-public class ETLMoh731GreenCardCohortLibrary {
+public class ETLThreePMGreenCardCohortLibrary {
 
     @Autowired
     private DatimCohortLibrary datimCohortLibrary;
+
+    public CohortDefinition getTotalHTSscreened() {
+        SqlCohortDefinition cd = new SqlCohortDefinition();
+        String sqlQuery = "select s.patient_id from kenyaemr_etl.etl_hts_eligibility_screening s where date(s.visit_date) between date(:startDate) and date(:endDate);";
+        cd.setName("totalHTSScreened");
+        cd.setQuery(sqlQuery);
+        cd.addParameter(new Parameter("startDate", "Start Date", Date.class));
+        cd.addParameter(new Parameter("endDate", "End Date", Date.class));
+        cd.setDescription("Total HTS Screened");
+
+        return cd;
+    }
 
     public CohortDefinition hivEnrollment(){
         SqlCohortDefinition cd = new SqlCohortDefinition();
@@ -54,7 +66,6 @@ public class ETLMoh731GreenCardCohortLibrary {
 
         return cd;
     }
-
     public CohortDefinition kpsWithHIVFollowupVisit(){
         SqlCohortDefinition cd = new SqlCohortDefinition();
         String sqlQuery = "\n" +

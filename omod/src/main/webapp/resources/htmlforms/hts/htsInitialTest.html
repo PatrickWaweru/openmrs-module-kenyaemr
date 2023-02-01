@@ -14,8 +14,8 @@
 -->
 <htmlform>
 
-    <script type="text/javascript" src="../moduleResources/kenyaemr/scripts/moment.js"></script>
-    <link rel="stylesheet" type="text/css" href="../moduleResources/kenyaemr/styles/kenyaemr_ml_scoring.css"></link>
+    <ifMode mode="VIEW" include="false"><script type="text/javascript" src="../moduleResources/kenyaemr/scripts/moment.js"></script></ifMode>
+    <ifMode mode="VIEW" include="false"><link rel="stylesheet" type="text/css" href="../moduleResources/kenyaemr/styles/kenyaemr_ml_scoring.css"></link></ifMode>
     <script type="text/javascript">
         var IS_KDoD_SITE = <lookup expression="kenyaemr.getFacilityType()" />;
         var IS_Recency_SITE = <lookup expression="kenyaemr.getRecencySite()" />;
@@ -926,9 +926,10 @@
 
         var mlFormattedDate = moment(new Date()).format('YYYY-MM-DD');
         var modelConfigs = {
-            "modelId":"hts_xgb_0323_jul_2022",
+            "modelId":"hts_xgb_1211_jan_2023",
             "encounterDate":mlFormattedDate,
-		    "facilityId":""
+		    "facilityId":"",
+            "debug": "true"
         }
         var mlScoringRequestPayload = {
             modelConfigs: modelConfigs,

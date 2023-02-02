@@ -947,7 +947,7 @@
                 data: JSON.stringify(mlScoringRequestPayload),
                 async: false,
                 success: function (response, textStatus, jqXHR) {
-                    var probabilityForPositivity = response.result["probability(1)"];
+                    var probabilityForPositivity = response.result.predictions["probability(1)"];
                     console.log("Success. Got probability as: " + probabilityForPositivity);
                     var lowRiskThreshold = 0.002625179;
                     var mediumRiskThreshold = 0.010638781;

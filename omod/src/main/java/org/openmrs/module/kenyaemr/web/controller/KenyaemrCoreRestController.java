@@ -252,9 +252,11 @@ public class KenyaemrCoreRestController extends BaseRestController {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/forms") // gets all visit forms for a patient
     @ResponseBody
-    public Object getAllAvailableFormsForVisit(HttpServletRequest request,
-            @RequestParam("patientUuid") String patientUuid) {
+    public Object getAllAvailableFormsForVisit(HttpServletRequest request, @RequestParam("patientUuid") String patientUuid) {
+
+        System.err.println("KenyaEMR module: Getting forms for patient: " + patientUuid);
         if (StringUtils.isBlank(patientUuid)) {
+            System.err.println("KenyaEMR module: Error patient uuid must be provided");
             return new ResponseEntity<Object>("You must specify patientUuid in the request!",
                     new HttpHeaders(), HttpStatus.BAD_REQUEST);
         }
@@ -262,11 +264,14 @@ public class KenyaemrCoreRestController extends BaseRestController {
         Patient patient = Context.getPatientService().getPatientByUuid(patientUuid);
 
         if (patient == null) {
+            System.err.println("KenyaEMR module: Error patient not found: " + patientUuid);
             return new ResponseEntity<Object>("The provided patient was not found in the system!",
                     new HttpHeaders(), HttpStatus.NOT_FOUND);
         }
 
         List<Visit> activeVisits = Context.getVisitService().getActiveVisitsByPatient(patient);
+        System.err.println("KenyaEMR module: Active patient visits: " + activeVisits.size());
+
         ArrayNode formList = JsonNodeFactory.instance.arrayNode();
         ObjectNode allFormsObj = JsonNodeFactory.instance.objectNode();
 
@@ -275,20 +280,25 @@ public class KenyaemrCoreRestController extends BaseRestController {
 
             FormManager formManager = CoreContext.getInstance().getManager(FormManager.class);
             List<FormDescriptor> uncompletedFormDescriptors = formManager.getAllUncompletedFormsForVisit(patientVisit);
+            System.err.println("KenyaEMR module: Got uncompleted forms for patient: " + uncompletedFormDescriptors.size());
 
             if (!uncompletedFormDescriptors.isEmpty()) {
 
                 for (FormDescriptor descriptor : uncompletedFormDescriptors) {
                     if (!descriptor.getTarget().getRetired()) {
                         ObjectNode formObj = generateFormDescriptorPayload(descriptor);
+                        System.err.println("KenyaEMR module: Adding form to initial form list");
                         formObj.put("formCategory", "available");
                         formList.add(formObj);
+                    } else {
+                        System.err.println("KenyaEMR module: Error: Cannot add form to initial formlist. Form is retired");
                     }
                 }
+
                 PatientWrapper patientWrapper = new PatientWrapper(patient);
-                Encounter lastMchEnrollment = patientWrapper.lastEncounter(
-                        MetadataUtils.existing(EncounterType.class, MchMetadata._EncounterType.MCHMS_ENROLLMENT));
-                if (lastMchEnrollment != null) {
+                Encounter lastMchEnrollment = patientWrapper.lastEncounter(MetadataUtils.existing(EncounterType.class, MchMetadata._EncounterType.MCHMS_ENROLLMENT));
+                
+                if(lastMchEnrollment != null) {
                     ObjectNode delivery = JsonNodeFactory.instance.objectNode();
                     delivery.put("uuid", MCH_DELIVERY_FORM_UUID);
                     delivery.put("name", "Delivery");
@@ -296,11 +306,14 @@ public class KenyaemrCoreRestController extends BaseRestController {
                     delivery.put("version", "1.0");
                     delivery.put("published", true);
                     delivery.put("retired", false);
+                    System.err.println("KenyaEMR module: Adding MCH Delivery form to initial form list");
                     formList.add(delivery);
+                } else {
+                    System.err.println("KenyaEMR module: Not enrolled for MCH. No need to add delivery form");
                 }
-                CalculationResult eligibleForDischarge = EmrCalculationUtils
-                        .evaluateForPatient(EligibleForMchmsDischargeCalculation.class, null, patient);
-                if ((Boolean) eligibleForDischarge.getValue() == true) {
+
+                CalculationResult eligibleForDischarge = EmrCalculationUtils.evaluateForPatient(EligibleForMchmsDischargeCalculation.class, null, patient);
+                if((Boolean) eligibleForDischarge.getValue() == true) {
                     ObjectNode discharge = JsonNodeFactory.instance.objectNode();
                     discharge.put("uuid", MCH_DISCHARGE_FORM_UUID);
                     discharge.put("name", "Discharge");
@@ -308,10 +321,20 @@ public class KenyaemrCoreRestController extends BaseRestController {
                     discharge.put("version", "1.0");
                     discharge.put("published", true);
                     discharge.put("retired", false);
+                    System.err.println("KenyaEMR module: Adding Discharge form to initial form list");
                     formList.add(discharge);
+                } else {
+                    System.err.println("KenyaEMR module: No need to Add Discharge form to initial form list");
                 }
+
+            } else {
+                System.err.println("KenyaEMR module: Error no uncompleted forms for patient: " + patientUuid);
             }
+        } else {
+            System.err.println("KenyaEMR module: Error no active visits for patient: " + patientUuid);
         }
+
+        System.err.println("KenyaEMR module: Total forms found: " + formList.size());
 
         allFormsObj.put("results", formList);
 
@@ -357,7 +380,9 @@ public class KenyaemrCoreRestController extends BaseRestController {
         CacheManager cacheManager = Context.getRegisteredComponent("apiCacheManager", CacheManager.class);
         Cache patientFlagCache = cacheManager.getCache("patientFlagCache");
         List<String> patientFlagsToRefreshOnEveryRequest = Arrays.asList(
-                "EligibleForIDSRFlagsCalculation");
+                "EligibleForIDSRFlagsCalculation",
+                "NTDPatientCalculation"
+        );
         calculationManager.refresh();
 
         /**

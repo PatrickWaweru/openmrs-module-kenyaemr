@@ -351,9 +351,11 @@ public class KenyaemrCoreRestController extends BaseRestController {
     @RequestMapping(method = RequestMethod.GET, value = "/flags") // gets all flags for a patient
     @ResponseBody
     @Cacheable(value = "patientFlagCache", key = "#patientUuid")
-    public Object getAllPatientFlags(HttpServletRequest request, @RequestParam("patientUuid") String patientUuid,
-            @SpringBean CalculationManager calculationManager) {
+    public Object getAllPatientFlags(HttpServletRequest request, @RequestParam("patientUuid") String patientUuid, @SpringBean CalculationManager calculationManager) {
+        
+        System.err.println("KenyaEMR module; Getting flags for patient UUID: " + patientUuid);
         if (StringUtils.isBlank(patientUuid)) {
+            System.err.println("KenyaEMR module; Getting flags: Error: You must specify patientUuid in the request!");
             return new ResponseEntity<Object>("You must specify patientUuid in the request!",
                     new HttpHeaders(), HttpStatus.BAD_REQUEST);
         }
@@ -364,6 +366,7 @@ public class KenyaemrCoreRestController extends BaseRestController {
                 false);
 
         if (patient == null) {
+            System.err.println("KenyaEMR module; Getting flags: Error: The provided patient was not found in the system!: " + patientUuid);
             return new ResponseEntity<Object>("The provided patient was not found in the system!",
                     new HttpHeaders(), HttpStatus.NOT_FOUND);
         }
@@ -373,6 +376,7 @@ public class KenyaemrCoreRestController extends BaseRestController {
 
         // TODO: Consider flags categorization for a patient who is not in any program
         if (programEnrolmentHistory.size() < 1) {
+            System.err.println("KenyaEMR module; Getting flags: Error: This patient has never been enrolled in any program. No flags can be shown");
             flagsObj.put("results", JsonNodeFactory.instance.arrayNode()); // return an empty list
             return flagsObj.toString();
         }
@@ -395,12 +399,12 @@ public class KenyaemrCoreRestController extends BaseRestController {
          * We only want to refresh flags which can change in the course of a visit
          */
         if (patientFlagCache != null && patientFlagCache.get(patientUuid) != null) {
-            patientFlagsMap = (HashMap<String, String>) cacheManager.getCache("patientFlagCache").get(patientUuid)
-                    .get();
+            System.err.println("KenyaEMR module; Getting flags: Flag cache is not null and we can get this patient from the cache");
+            patientFlagsMap = (HashMap<String, String>) cacheManager.getCache("patientFlagCache").get(patientUuid).get();
             for (PatientFlagCalculation calc : calculationManager.getFlagCalculations()) {
 
-                if (!(calc instanceof PatientFlagCalculation)
-                        || !patientFlagsToRefreshOnEveryRequest.contains(calc.getClass().getSimpleName())) {
+                if (!(calc instanceof PatientFlagCalculation) || !patientFlagsToRefreshOnEveryRequest.contains(calc.getClass().getSimpleName())) {
+                    System.err.println("KenyaEMR module; Getting flags: Skip: Either this is not a patient flag or it is not part of exeptions");
                     continue;
                 }
 
@@ -419,7 +423,10 @@ public class KenyaemrCoreRestController extends BaseRestController {
             patientFlagCache.put(patient.getUuid(), patientFlagsMap);
 
             flagsObj.put("results", composePatientFlagsFromMap(patientFlagsMap));
+            System.err.println("KenyaEMR module; Getting flags: Flags 1: " + flagsObj.toString());
             return flagsObj.toString();
+        } else {
+            System.err.println("KenyaEMR module; Getting flags: Skip Step: Eithe Flag cache is null or we cannot get this patient from the cache");
         }
 
         // define a hashmap of flag name and value for ease of update in other parts of
@@ -427,6 +434,7 @@ public class KenyaemrCoreRestController extends BaseRestController {
         for (PatientFlagCalculation calc : calculationManager.getFlagCalculations()) {
 
             if (!(calc instanceof PatientFlagCalculation)) { // we are only interested in flags calculation
+                System.err.println("KenyaEMR module; Getting flags: Skip 2: This is not a patient flag calculation");
                 continue;
             }
 
@@ -434,22 +442,31 @@ public class KenyaemrCoreRestController extends BaseRestController {
                 CalculationResult result = Context.getService(PatientCalculationService.class).evaluate(patient.getId(),
                         calc);
                 if (result != null && (Boolean) result.getValue()) {
+                    System.err.println("KenyaEMR module; Getting flags: Flag result: Result is NOT null and value is true");
                     patientFlagsMap.put(calc.getClass().getSimpleName(), calc.getFlagMessage());
+                } else {
+                    System.err.println("KenyaEMR module; Getting flags: Skip 3: Result is null or/and value is false");
                 }
-            } catch (Exception ex) {
-                System.out.println("Error evaluating " + ex.getMessage());
+            }
+            catch (Exception ex) {
+                System.err.println("KenyaEMR module; Getting flags: Error evaluating " + ex.getMessage());
                 log.error("Error evaluating " + calc.getClass(), ex);
+                ex.printStackTrace();
             }
         }
 
         // add last update timestamp
         if (patientFlagCache != null) {
+            System.err.println("KenyaEMR module; Getting flags: Cache is not null. We add the flags to it");
             patientFlagsMap.put("lastUpdated", Instant.now().toString());
             patientFlagCache.put(patient.getUuid(), patientFlagsMap);
+        } else {
+            System.err.println("KenyaEMR module; Getting flags: Cache is null. We cannot add the flags to it");
         }
-        flagsObj.put("results", composePatientFlagsFromMap(patientFlagsMap));
-        return flagsObj.toString();
 
+        flagsObj.put("results", composePatientFlagsFromMap(patientFlagsMap));
+        System.err.println("KenyaEMR module; Getting flags: Flags 2: " + flagsObj.toString());
+        return flagsObj.toString();
     }
 
     /**

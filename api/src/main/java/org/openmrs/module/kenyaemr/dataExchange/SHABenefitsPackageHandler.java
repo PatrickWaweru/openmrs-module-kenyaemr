@@ -19,20 +19,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-
+import org.openmrs.util.OpenmrsUtil;
 import java.net.HttpURLConnection;
 
 import static org.openmrs.module.kenyaemr.util.EmrUtils.getGlobalPropertyValue;
 
 public class SHABenefitsPackageHandler extends DataHandler{
-    private static final String LOCAL_FILE_PATH = "/var/lib/OpenMRS/sha/sha_benefits_package.json";
+    private static String LOCAL_FILE_PATH = OpenmrsUtil.getApplicationDataDirectory() + "/sha/sha_benefits_package.json";
 
     private static final Logger log = LoggerFactory.getLogger(SHABenefitsPackageHandler.class);
 
     private static final String BASE_URL_KEY = CommonMetadata.GP_HIE_BASE_END_POINT_URL;
 
     public SHABenefitsPackageHandler() {
+        // String baseDirectory = OpenmrsUtil.getApplicationDataDirectory();
+        // System.out.println("KenyaEMR module: Base install directory: " + baseDirectory);
+        // LOCAL_FILE_PATH = baseDirectory + "/sha/sha_benefits_package.json";
+        // System.out.println("KenyaEMR module: SHA benefits directory: " + LOCAL_FILE_PATH);
         super(LOCAL_FILE_PATH);
+        System.out.println("KenyaEMR module: SHA benefits directory: " + LOCAL_FILE_PATH);
     }
 
     @Override

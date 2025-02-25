@@ -28,11 +28,12 @@ import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import org.openmrs.util.OpenmrsUtil;
 
 import static org.openmrs.module.kenyaemr.util.EmrUtils.getGlobalPropertyValue;
 
 public class FacilityStatusHandler extends DataHandler {
-    private static final String LOCAL_FILE_PATH = "/var/lib/OpenMRS/sha/sha_facility_status.json";
+    private static String LOCAL_FILE_PATH = OpenmrsUtil.getApplicationDataDirectory() + "/sha/sha_facility_status.json";
 
     private static final Logger log = LoggerFactory.getLogger(FacilityStatusHandler.class);
 
@@ -40,7 +41,12 @@ public class FacilityStatusHandler extends DataHandler {
     private static final String FACILITY_REGISTRATION_NUMBER = CommonMetadata.GP_SHA_FACILITY_REGISTRATION_NUMBER;
 
     public FacilityStatusHandler() {
+        // String baseDirectory = OpenmrsUtil.getApplicationDataDirectory();
+        // System.out.println("KenyaEMR module: Base install directory: " + baseDirectory);
+        // LOCAL_FILE_PATH = baseDirectory + "/sha/sha_facility_status.json";
+        // System.out.println("KenyaEMR module: SHA facility status directory: " + LOCAL_FILE_PATH);
         super(LOCAL_FILE_PATH);
+        System.out.println("KenyaEMR module: SHA facility status directory: " + LOCAL_FILE_PATH);
     }
 
     @Override
@@ -72,8 +78,10 @@ public class FacilityStatusHandler extends DataHandler {
 
         try {
             CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(createSslConnectionFactory()).build();
-            HttpGet getRequest = new HttpGet(getGlobalPropertyValue(BASE_URL_KEY) + "fhir/Organization?identifierType=registration-number&identifier=" + faciltyRegistrationNumber);
+            String url = getGlobalPropertyValue(BASE_URL_KEY) + "fhir/Organization?identifierType=registration-number&identifier=" + faciltyRegistrationNumber;
+            HttpGet getRequest = new HttpGet(url);
             getRequest.setHeader("Authorization", "Bearer " + bearerToken);
+            System.out.println("Connecting to remote using URL: " + url + " and token: " + bearerToken);
 
             HttpResponse response = httpClient.execute(getRequest);
 

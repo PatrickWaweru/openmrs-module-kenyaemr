@@ -257,4 +257,17 @@
 		<property name="developer" value="${user.name}"/>
 	</bean>
 
+	<bean id="ehCacheManagerFactory"
+		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation" value="classpath:ehcache.xml"/>
+		<property name="shared" value="true"/>
+	</bean>
+
+	<bean id="cacheManager"
+		class="org.springframework.cache.ehcache.EhCacheCacheManager">
+		<property name="cacheManager" ref="ehCacheManagerFactory"/>
+	</bean>
+
+	<cache:annotation-driven/>
+
 </beans>

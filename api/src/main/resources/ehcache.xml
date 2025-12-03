@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    This Source Code Form is subject to the terms of the Mozilla Public License,
+    v. 2.0. If a copy of the MPL was not distributed with this file, You can
+    obtain one at http://mozilla.org/MPL/2.0/. OpenMRS is also distributed under
+    the terms of the Healthcare Disclaimer located at http://openmrs.org/license.
+
+    Copyright (C) OpenMRS Inc. OpenMRS is a registered trademark and the OpenMRS
+    graphic logo is a trademark of OpenMRS Inc.
+
+-->
+<ehcache
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+        updateCheck="false"
+        monitoring="autodetect"
+        dynamicConfig="true">
+
+    <!-- Where cached data is stored if it spills to disk -->
+    <diskStore path="java.io.tmpdir/openmrs-cache"/>
+
+    <!-- Default settings for any unnamed caches -->
+    <defaultCache
+            maxEntriesLocalHeap="500"
+            eternal="false"
+            timeToIdleSeconds="300"
+            timeToLiveSeconds="600"
+            overflowToDisk="false"
+            statistics="true" />
+
+    <!-- patientFlagCache -->
+    <cache
+            name="patientFlagCache"
+            maxEntriesLocalHeap="1000"
+            eternal="false"
+            timeToIdleSeconds="10800"
+            timeToLiveSeconds="10800"
+            overflowToDisk="true"
+            statistics="true">
+    </cache>
+
+</ehcache>

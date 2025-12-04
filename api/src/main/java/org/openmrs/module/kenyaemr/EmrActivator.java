@@ -27,8 +27,12 @@ import org.openmrs.module.reporting.report.service.ReportService;
 import org.openmrs.util.OpenmrsUtil;
 import org.openmrs.web.WebConstants;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +48,32 @@ public class EmrActivator implements ModuleActivator {
 		// Possibly bad practice but we really want to see these startup log messages
 		LogManager.getLogger("org.openmrs.module.kenyacore").setLevel(Level.INFO);
 		LogManager.getLogger("org.openmrs.module.kenyaemr").setLevel(Level.INFO);
+	}
+
+	static {
+		try {
+			Class.forName("net.sf.ehcache.CacheManager");
+			System.out.println("KenyaEMR: EH CACHE FOUND");
+			CacheManager manager = CacheManager.getInstance();
+			System.out.println("KenyaEMR: EH CacheManager Name: " + manager.getName());
+			System.out.println("KenyaEMR: EH Config source: " + manager.getConfiguration().getConfigurationSource());
+
+			Cache cache = manager.getCache("patientFlagCache");
+
+			if (cache == null) {
+				System.err.println("KenyaEMR: EH CACHE NOT LOADED: patientFlagCache");
+				System.err.println("KenyaEMR: EH Available caches: " + Arrays.toString(manager.getCacheNames()));
+			} else {
+				System.out.println("KenyaEMR: EH CACHE LOADED: patientFlagCache");
+				System.out.println("KenyaEMR: EH TTL: " + cache.getCacheConfiguration().getTimeToLiveSeconds());
+				System.out.println("KenyaEMR: EH Max entries: " + cache.getCacheConfiguration().getMaxEntriesLocalHeap());
+				System.out.println("KenyaEMR: EH TTI: " + cache.getCacheConfiguration().getTimeToIdleSeconds());
+				System.out.println("KenyaEMR: EH Stats: " + cache.getCacheConfiguration().getStatistics());           
+			}
+		} catch (Exception e) {
+			System.err.println("KenyaEMR ERROR: EH CACHE NOT FOUND");
+			e.printStackTrace();
+		}
 	}
 
 	/**

@@ -81,7 +81,7 @@ public class EmrActivator implements ModuleActivator {
 	 */
 	public void willRefreshContext() {
 
-		log.info("KenyaEMR context refreshing...");
+		System.err.println("KenyaEMR Module context refreshing...");
 		//TODO: Investigate what causes reports page to load slowly. This behavior started with platform 2.x upgrade
 		Context.getAdministrationService().executeSQL("delete from reporting_report_request", false);
 	}
@@ -90,7 +90,7 @@ public class EmrActivator implements ModuleActivator {
 	 * @see ModuleActivator#willStart()
 	 */
 	public void willStart() {
-		log.info("KenyaEMR starting...");
+		System.err.println("KenyaEMR Module starting...");
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class EmrActivator implements ModuleActivator {
 		catch (Exception ex) {
 			// If an error occurs during core refresh, we need KenyaEMR to still start so that the error can be
 			// communicated to an admin user. So we catch exceptions, log them and alert super users.
-			log.error("Unable to refresh core context", ex);
+			System.err.println("Unable to refresh core context: " + ex);
 
 			// TODO re-enable once someone fixes TRUNK-4267
 			//Context.getAlertService().notifySuperUsers("Unable to start KenyaEMR", ex);
@@ -116,7 +116,7 @@ public class EmrActivator implements ModuleActivator {
 	 * @see ModuleActivator#started()
 	 */
 	public void started() {
-		log.info("KenyaEMR started");
+		System.err.println("KenyaEMR Module started");
 		AdministrationService administrationService = Context.getAdministrationService();
 		administrationService.executeSQL("UPDATE form SET published = 1 where retired = 0", false);
 
@@ -135,13 +135,13 @@ public class EmrActivator implements ModuleActivator {
 	 * @see ModuleActivator#willStop()
 	 */
 	public void willStop() {
-		log.info("KenyaEMR stopping...");
+		System.err.println("KenyaEMR Module stopping...");
 	}
 
 	/**
 	 * @see ModuleActivator#stopped()
 	 */
 	public void stopped() {
-		log.info("KenyaEMR stopped");
+		System.err.println("KenyaEMR Module stopped");
 	}
 }

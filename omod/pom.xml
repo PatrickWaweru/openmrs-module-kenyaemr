@@ -25,7 +25,7 @@
 	<description>OMOD project for KenyaEMR Module</description>
 
 	<dependencies>
-		<dependency>
+		<!-- <dependency>
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache</artifactId>
 			<version>2.10.9.2</version>
@@ -43,7 +43,7 @@
                     <artifactId>logback-classic</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency> -->
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>${project.parent.artifactId}-api</artifactId>
